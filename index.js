@@ -12,20 +12,39 @@ const client = new Client({
     ]
 });
 
+// Contants
+const guildId = '1215081626527342613';
+const mainChannelId = '1215081627017936999';
+
 // FUNCTIONS
 
 // Function to send a message to a channel
 async function sendMessageToChannel(channelId, messageContent) {
     try {
-        console.log('Fetching channel with ID:', channelId);
+        //console.log('Fetching channel with ID:', channelId);
         const channel = await client.channels.fetch(channelId);
-        console.log('Channel Name:', channel.name);
-        console.log('Channel type:', channel.type);
+        //console.log('Channel Name:', channel.name);
+        //console.log('Channel type:', channel.type);
         if (channel && channel.type === ChannelType.GuildText) {
             await channel.send(messageContent);
             console.log('Message sent successfully.');
         } else {
             console.log('Invalid channel or channel is not a text channel.');
+        }
+    } catch (error) {
+        console.error('Error sending message:', error);
+    }
+}
+
+// Sends a message to a user's direct message
+async function sendMessageToUser(userId, messageContent) {
+    try {
+        const guild = await client.guilds.fetch(guildId);
+        const user = await guild.members.fetch(userId);
+        if (user) {
+            await user.send(messageContent);
+        } else {
+            console.log('This user does not exist');
         }
     } catch (error) {
         console.error('Error sending message:', error);
@@ -52,10 +71,10 @@ async function giveRoleUser(guild, userId, roleId){
 // Currently it just assigns the Test role to a user
 async function test(){
     try {
-        const guild = await client.guilds.fetch('1215081626527342613');
+        const guild = await client.guilds.fetch(guildId);
         const testRoleId = '1219759540556529664';
         const result = await giveRoleUser(guild, '193142397142695936', testRoleId);
-        await sendMessageToChannel('1215081627017936999', result);
+        await sendMessageToChannel(mainChannelId, result);
     } catch(error) {
         console.log('Error adding role to user:', error);
     }
@@ -69,7 +88,8 @@ async function test(){
 client.once(Events.ClientReady, async(readyClient) => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
     try {
-        await sendMessageToChannel('1215081627017936999', '**bold text**');
+        //await sendMessageToChannel('1215081627017936999', '**bold text**');
+        await sendMessageToUser('193142397142695936', 'this is a secret message do not share');
     } catch(error) {
         console.error('Error fetching guild:', error);
     }
